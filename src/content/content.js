@@ -55,27 +55,6 @@ console.log("✅Study mode is running...");
     }
   }
 
-  // ----------------- Mutation Observer for Dynamic Content -----------------
-  function initObserver() {
-    const observer = new MutationObserver(() => {
-      removeShortsUI();
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    console.log("[Observer] MutationObserver initialized");
-  }
-
-  // ----------------- Runner -----------------
-  // initial run on page load
-  function init() {
-    blockShortsPage();
-    removeShortsUI();
-    initObserver();
-  }
-
-  init();
-
   // handle dynamic page changes (YouTube is a SPA, so we need to check for URL changes)
   setInterval(() => {
     if (lastUrl !== location.href) {
@@ -89,3 +68,45 @@ console.log("✅Study mode is running...");
   // add click listener to block shorts clicks
   document.addEventListener("click", handleShortsClicks);
 })();
+
+
+
+// ======================== Feature 2: Filtering content ========================
+
+// ------------------ Core filtering logic -----------------
+const allowedKeywords = [
+  "react",
+  "javascript",
+  "node",
+  "coding",
+  "tutorial",
+  "course",
+  "programming",
+  "development"
+];
+
+function isEducational(title) {
+    const lower = title.toLowerCase();
+    return allowedKeywords.some(keyword => lower.includes(keyword));
+}
+
+// ----------------- Mutation Observer for Dynamic Content -----------------
+function initObserver() {
+  const observer = new MutationObserver(() => {
+    removeShortsUI();
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  console.log("[Observer] MutationObserver initialized");
+}
+
+// ----------------- Runner -----------------
+// initial run on page load
+function init() {
+  blockShortsPage();
+  removeShortsUI();
+  initObserver();
+}
+
+init();
