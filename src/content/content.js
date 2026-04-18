@@ -16,13 +16,13 @@ console.log("✅Study mode is running...");
   function removeShortsUI() {
     // remove shorts shelf (homepage)
     const shortsShelfs = document.querySelectorAll("ytd-shorts-shelf-renderer");
-    shortsShelfs.forEach((shelf) => shelf.remove());
+    shortsShelfs.forEach((shelf) => shelf?.remove());
 
     // remove shorts video renderers
     const shortsRenderers = document.querySelectorAll(
       "ytd-reel-video-renderer",
     );
-    shortsRenderers.forEach((renderer) => renderer.remove());
+    shortsRenderers.forEach((renderer) => renderer?.remove());
 
     // remove shorts button forom the sidebar
     const shortsButton = document.querySelector("a[title='Shorts']");
