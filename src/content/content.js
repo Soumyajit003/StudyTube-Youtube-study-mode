@@ -5,9 +5,10 @@ console.log("✅Study mode is running...");
   let lastUrl = location.href;
 
   // ----------------- Shorts Blocking -----------------
-  function blockShorts() {
+  function blockShortsPage() {
     if (window.location.pathname.startsWith("/shorts")) {
-      window.location.href = "/";
+      console.log("[Shorts] Redirecting to homepage...");
+      window.location.replace("https://www.youtube.com/");
     }
   }
 
@@ -19,7 +20,7 @@ console.log("✅Study mode is running...");
 
     // remove shorts video renderers
     const shortsRenderers = document.querySelectorAll(
-      "ytd-reel-video-renderer"
+      "ytd-reel-video-renderer",
     );
     shortsRenderers.forEach((renderer) => renderer.remove());
 
@@ -42,24 +43,37 @@ console.log("✅Study mode is running...");
     }
   }
 
-  // ----------------- Runner -----------------
-  function runShortsFeatures(){
-    blockShorts();
-    removeShortsUI();
+  // ----------------- Mutation Observer for Dynamic Content -----------------
+  function initObserver() {
+    const observer = new MutationObserver(() => {
+      removeShortsUI();
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    console.log("[Observer] MutationObserver initialized");
   }
 
-  runShortsFeatures();  // run immediately on page load
+  // ----------------- Runner -----------------
+  // initial run on page load
+  function init() {
+    blockShortsPage();
+    removeShortsUI();
+    initObserver();
+  }
+
+  init();
 
   // handle dynamic page changes (YouTube is a SPA, so we need to check for URL changes)
   setInterval(() => {
-    if(lastUrl !== location.href) {
+    if (lastUrl !== location.href) {
       lastUrl = location.href;
       console.log("[NAV] URL changed");
-      runShortsFeatures();
+
+      blockShortsPage();
     }
-  }, 1000);
+  }, 500);
 
   // add click listener to block shorts clicks
-    document.addEventListener("click", handleShortsClicks);
-
+  document.addEventListener("click", handleShortsClicks);
 })();
