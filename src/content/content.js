@@ -14,19 +14,31 @@ console.log("✅Study mode is running...");
 
   // remove shorts video renderers from the page
   function removeShortsUI() {
-    // remove shorts shelf (homepage)
-    const shortsShelfs = document.querySelectorAll("ytd-shorts-shelf-renderer");
-    shortsShelfs.forEach((shelf) => shelf?.remove());
+    try {
+      // remove shorts shelf (homepage)
+      const shortsShelfs = document.querySelectorAll(
+        "ytd-shorts-shelf-renderer",
+      );
+      shortsShelfs.forEach((shelf) => shelf?.remove());
 
-    // remove shorts video renderers
-    const shortsRenderers = document.querySelectorAll(
-      "ytd-reel-video-renderer",
-    );
-    shortsRenderers.forEach((renderer) => renderer?.remove());
+      // remove shorts video renderers
+      const shortsRenderers = document.querySelectorAll(
+        "ytd-reel-video-renderer",
+      );
+      shortsRenderers.forEach((renderer) => renderer?.remove());
 
-    // remove shorts button forom the sidebar
-    const shortsButton = document.querySelector("a[title='Shorts']");
-    if (shortsButton) shortsButton.style.display = "none";
+      // remove shorts section from the homepage
+      const shortsSectionHome = document.querySelectorAll(
+        "ytd-rich-section-renderer",
+      );
+      shortsSectionHome.forEach((section) => section?.remove());
+
+      // remove shorts button forom the sidebar
+      const shortsButton = document.querySelector("a[title='Shorts']");
+      if (shortsButton) shortsButton.style.display = "none";
+    } catch (error) {
+      console.log("[Shorts Error]", err);
+    }
   }
 
   // ----------------- Shorts Click Blocking -----------------
