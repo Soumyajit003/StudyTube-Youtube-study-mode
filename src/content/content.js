@@ -43,7 +43,7 @@ console.log("✅Study mode is running...");
 
   // ----------------- Shorts Click Blocking -----------------
   function handleShortsClicks(e) {
-    // This runs whenever the user clicks anywhere on the page
+    // this runs whenever the user clicks anywhere on the page
     const link = e.target.closest("a");
 
     if (!link) return;
