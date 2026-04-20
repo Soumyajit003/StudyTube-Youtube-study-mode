@@ -90,6 +90,12 @@ function isEducational(title) {
     return allowedKeywords.some(keyword => lower.includes(keyword));
 }
 
+function filterContent() {
+  const videos = document.querySelectorAll("ytd-rich-item-renderer");
+  console.log(vidoes)
+}
+
+
 // ----------------- Mutation Observer for Dynamic Content -----------------
 function initObserver() {
   const observer = new MutationObserver(() => {
@@ -107,6 +113,7 @@ function init() {
   blockShortsPage();
   removeShortsUI();
   initObserver();
+  filterContent();
 }
 
 init();
