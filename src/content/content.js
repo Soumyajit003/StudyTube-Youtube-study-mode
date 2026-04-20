@@ -107,15 +107,149 @@ console.log("✅Study mode is running...");
 
   // ------------------ Core filtering logic -----------------
   const allowedKeywords = [
+    // Programming & Web Dev
     "react",
     "javascript",
+    "typescript",
     "node",
+    "nodejs",
+    "python",
+    "java",
+    "c++",
+    "rust",
+    "golang",
+    "php",
+    "ruby",
+    "swift",
+    "kotlin",
+    "dart",
+    "html",
+    "css",
+    "sass",
+    "tailwind",
+    "bootstrap",
+    "nextjs",
+    "vue",
+    "angular",
+    "svelte",
+    "express",
+    "fastapi",
+    "django",
     "coding",
     "tutorial",
     "course",
     "programming",
     "development",
     "roadmap",
+    "developer",
+    "devops",
+    "backend",
+    "frontend",
+    "fullstack",
+
+    // CS Fundamentals
+    "algorithm",
+    "data structure",
+    "leetcode",
+    "system design",
+    "design pattern",
+    "operating system",
+    "computer science",
+    "networking",
+    "database",
+    "sql",
+    "compiler",
+    "recursion",
+    "big o",
+    "complexity",
+
+    // Tools & Platforms
+    "git",
+    "github",
+    "docker",
+    "kubernetes",
+    "linux",
+    "terminal",
+    "bash",
+    "aws",
+    "azure",
+    "gcp",
+    "cloud",
+    "ci/cd",
+    "firebase",
+    "supabase",
+
+    // AI / ML
+    "machine learning",
+    "deep learning",
+    "artificial intelligence",
+    "ai",
+    "neural network",
+    "llm",
+    "nlp",
+    "computer vision",
+    "tensorflow",
+    "pytorch",
+    "data science",
+    "pandas",
+    "numpy",
+    "kaggle",
+
+    // General Education
+    "lecture",
+    "explained",
+    "explanation",
+    "learn",
+    "learning",
+    "study",
+    "education",
+    "academic",
+    "university",
+    "exam",
+    "quiz",
+    "homework",
+    "mathematics",
+    "math",
+    "calculus",
+    "algebra",
+    "statistics",
+    "physics",
+    "chemistry",
+    "biology",
+    "science",
+    "history",
+    "geography",
+    "economics",
+    "psychology",
+    "philosophy",
+    "engineering",
+
+    // Career & Productivity
+    "interview",
+    "resume",
+    "career",
+    "job",
+    "internship",
+    "freelance",
+    "productivity",
+    "focus",
+    "habit",
+    "self improvement",
+    "skill",
+    "project management",
+    "communication",
+    "leadership",
+
+    // Finance & Business
+    "finance",
+    "investing",
+    "stock market",
+    "trading",
+    "startup",
+    "business",
+    "entrepreneur",
+    "accounting",
+    "tax",
   ];
 
   // core logic to check if a video is educational based on its title
@@ -126,55 +260,59 @@ console.log("✅Study mode is running...");
 
   // main function to filter content on the page
   function filterContent() {
-  const videos = document.querySelectorAll(
-    "ytd-rich-item-renderer, ytd-video-renderer, yt-lockup-view-model",
-  );
-
-  videos.forEach((video) => {
-    const titleElement = video.querySelector("h3 a[aria-label]");
-    const title = titleElement?.getAttribute("aria-label")?.trim() ?? "";
-
-    const mixTitleElement = video.querySelector(
-      "h3.ytLockupMetadataViewModelHeadingReset span",
-    );
-    const mixTitle = mixTitleElement?.textContent?.trim() ?? "";
-
-    const thumbnailDiv = video.querySelector("yt-thumbnail-view-model div");
-    const thumbnailImg = video.querySelector("ytd-thumbnail");
-    const videoDescriptionSnippet = video.querySelector(
-      "yt-formatted-string.metadata-snippet-text",
+    const videos = document.querySelectorAll(
+      "ytd-rich-item-renderer, ytd-video-renderer, yt-lockup-view-model",
     );
 
-    const applyBlur = (titleEl) => {
-      video.style.opacity = "0.5";
-      video.style.pointerEvents = "none";
-      if (thumbnailDiv) thumbnailDiv.style.filter = "blur(20px)";
-      if (thumbnailImg) thumbnailImg.style.filter = "blur(20px)";
-      if (videoDescriptionSnippet)
-        videoDescriptionSnippet.style.filter = "blur(10px)";
-      if (titleEl) titleEl.style.filter = "blur(10px)";
-    };
+    videos.forEach((video) => {
+      const titleElement = video.querySelector("h3 a[aria-label]");
+      const title = titleElement?.getAttribute("aria-label")?.trim() ?? "";
 
-    const removeBlur = (titleEl) => {
-      video.style.opacity = "1";
-      video.style.pointerEvents = "auto";
-      if (thumbnailDiv) thumbnailDiv.style.filter = "none";
-      if (thumbnailImg) thumbnailImg.style.filter = "none";
-      if (videoDescriptionSnippet)
-        videoDescriptionSnippet.style.filter = "none";
-      if (titleEl) titleEl.style.filter = "none";
-    };
+      const mixTitleElement = video.querySelector(
+        "h3.ytLockupMetadataViewModelHeadingReset span",
+      );
+      const mixTitle = mixTitleElement?.textContent?.trim() ?? "";
 
-    // Handle regular videos
-    if (title) {
-      isEducational(title) ? removeBlur(titleElement) : applyBlur(titleElement);
-      return; // already handled, skip mix check
-    }
+      const thumbnailDiv = video.querySelector("yt-thumbnail-view-model div");
+      const thumbnailImg = video.querySelector("ytd-thumbnail");
+      const videoDescriptionSnippet = video.querySelector(
+        "yt-formatted-string.metadata-snippet-text",
+      );
 
-    // Handle mix playlists
-    if (mixTitle) {
-      isEducational(mixTitle) ? removeBlur(mixTitleElement) : applyBlur(mixTitleElement);
-    }
-  });
-}
+      const applyBlur = (titleEl) => {
+        video.style.opacity = "0.5";
+        video.style.pointerEvents = "none";
+        if (thumbnailDiv) thumbnailDiv.style.filter = "blur(20px)";
+        if (thumbnailImg) thumbnailImg.style.filter = "blur(20px)";
+        if (videoDescriptionSnippet)
+          videoDescriptionSnippet.style.filter = "blur(10px)";
+        if (titleEl) titleEl.style.filter = "blur(10px)";
+      };
+
+      const removeBlur = (titleEl) => {
+        video.style.opacity = "1";
+        video.style.pointerEvents = "auto";
+        if (thumbnailDiv) thumbnailDiv.style.filter = "none";
+        if (thumbnailImg) thumbnailImg.style.filter = "none";
+        if (videoDescriptionSnippet)
+          videoDescriptionSnippet.style.filter = "none";
+        if (titleEl) titleEl.style.filter = "none";
+      };
+
+      // Handle regular videos
+      if (title) {
+        isEducational(title)
+          ? removeBlur(titleElement)
+          : applyBlur(titleElement);
+        return; // already handled, skip mix check
+      }
+
+      // Handle mix playlists
+      if (mixTitle) {
+        isEducational(mixTitle)
+          ? removeBlur(mixTitleElement)
+          : applyBlur(mixTitleElement);
+      }
+    });
+  }
 })();
