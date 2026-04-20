@@ -111,11 +111,9 @@ console.log("✅Study mode is running...");
     "react",
     "javascript",
     "typescript",
-    "node",
     "nodejs",
     "python",
     "java",
-    "c++",
     "rust",
     "golang",
     "php",
@@ -124,12 +122,11 @@ console.log("✅Study mode is running...");
     "kotlin",
     "dart",
     "html",
-    "css",
     "sass",
     "tailwind",
     "bootstrap",
     "nextjs",
-    "vue",
+    "vuejs",
     "angular",
     "svelte",
     "express",
@@ -157,11 +154,8 @@ console.log("✅Study mode is running...");
     "computer science",
     "networking",
     "database",
-    "sql",
     "compiler",
     "recursion",
-    "big o",
-    "complexity",
 
     // Tools & Platforms
     "git",
@@ -171,22 +165,16 @@ console.log("✅Study mode is running...");
     "linux",
     "terminal",
     "bash",
-    "aws",
-    "azure",
-    "gcp",
-    "cloud",
-    "ci/cd",
     "firebase",
     "supabase",
+    "deployment",
 
     // AI / ML
     "machine learning",
     "deep learning",
     "artificial intelligence",
-    "ai",
     "neural network",
-    "llm",
-    "nlp",
+    "natural language processing",
     "computer vision",
     "tensorflow",
     "pytorch",
@@ -199,17 +187,13 @@ console.log("✅Study mode is running...");
     "lecture",
     "explained",
     "explanation",
-    "learn",
     "learning",
     "study",
     "education",
     "academic",
     "university",
     "exam",
-    "quiz",
-    "homework",
     "mathematics",
-    "math",
     "calculus",
     "algebra",
     "statistics",
@@ -228,34 +212,56 @@ console.log("✅Study mode is running...");
     "interview",
     "resume",
     "career",
-    "job",
     "internship",
     "freelance",
     "productivity",
-    "focus",
-    "habit",
     "self improvement",
-    "skill",
     "project management",
-    "communication",
-    "leadership",
 
     // Finance & Business
     "finance",
     "investing",
     "stock market",
-    "trading",
     "startup",
     "business",
     "entrepreneur",
     "accounting",
-    "tax",
   ];
 
-  // core logic to check if a video is educational based on its title
+  // Risky short keywords handled separately with strict word boundary
+  const exactKeywords = ["css", "sql", "aws", "gcp", "llm", "nlp", "git"];
+
   function isEducational(title) {
     const lower = title.toLowerCase();
-    return allowedKeywords.some((keyword) => lower.includes(keyword));
+
+    // Always block mixes
+    if (lower.startsWith("mix -")) return false;
+
+    // Block entertainment
+    const blockedPatterns = [
+      /\btrailer\b/,
+      /\bofficial video\b/,
+      /\bmusic video\b/,
+      /\bmv\b/,
+      /\blyrics\b/,
+      /\baudio\b/,
+      /\bsong\b/,
+      /\bfull movie\b/,
+      /\bclip\b/,
+      /\bhighlights\b/,
+      /\bprank\b/,
+      /\bvlog\b/,
+      /\bchallenge\b/,
+      /\bmeme\b/,
+    ];
+    if (blockedPatterns.some((pattern) => pattern.test(lower))) return false;
+
+    // Check exact/short keywords with word boundary
+    if (exactKeywords.some((kw) => new RegExp(`\\b${kw}\\b`, "i").test(lower)))
+      return true;
+
+    // Check regular keywords (phrases are safe from false positives)
+    return allowedKeywords.some((kw) => lower.includes(kw));
   }
 
   // main function to filter content on the page
