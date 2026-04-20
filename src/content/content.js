@@ -40,6 +40,8 @@ console.log("✅Study mode is running...");
       );
       shortsSectionHome.forEach((section) => section?.remove());
 
+      //grid-shelf-view-model
+
       // remove shorts button forom the sidebar
       const shortsButton = document.querySelector("a[title='Shorts']");
       if (shortsButton) shortsButton.style.display = "none";
@@ -50,7 +52,7 @@ console.log("✅Study mode is running...");
 
   // ----------------- Shorts Click Blocking -----------------
   function handleShortsClicks(e) {
-    // this runs whenever the user clicks anywhere on the page
+    // This runs whenever the user clicks anywhere on the page
     const link = e.target.closest("a");
 
     if (!link) return;
@@ -110,15 +112,51 @@ console.log("✅Study mode is running...");
     "course",
     "programming",
     "development",
+    "roadmap",
+    "guide",
   ];
 
+  // core logic to check if a video is educational based on its title
   function isEducational(title) {
     const lower = title.toLowerCase();
     return allowedKeywords.some((keyword) => lower.includes(keyword));
   }
 
+  // main function to filter content on the page
   function filterContent() {
     const videos = document.querySelectorAll("ytd-rich-item-renderer, ytd-video-renderer, yt-lockup-view-model");
-    console.log(videos);
+
+    videos.forEach((video) => {
+
+      // for the videos
+      const titleElement = video.querySelector("h3 a[aria-label]");
+      const title = titleElement ? titleElement.getAttribute("aria-label").trim() : "";
+      console.log(title);
+
+      const thumbnailDiv = video.querySelector("yt-thumbnail-view-model div");
+      const thumbnailImg = video.querySelector("ytd-thumbnail");
+
+      const videoDescriptionSnippet = video.querySelector("yt-formatted-string.metadata-snippet-text");
+
+      if(!title) return;
+
+      const allowed = isEducational(title);
+
+      if(!allowed){
+        video.style.opacity = "0.5";
+        video.style.pointerEvents = "none";
+        if(thumbnailDiv) thumbnailDiv.style.filter = "blur(20px)";
+        if(thumbnailImg) thumbnailImg.style.filter = "blur(20px)";
+        if(videoDescriptionSnippet) videoDescriptionSnippet.style.filter = "blur(10px)";
+        titleElement.style.filter = "blur(10px)";
+      }else {
+        video.style.opacity = "1";
+        video.style.pointerEvents = "auto";
+        if(thumbnailDiv) thumbnailDiv.style.filter = "none";
+        if(thumbnailImg) thumbnailImg.style.filter = "none";
+        titleElement.style.filter = "none";
+
+      }
+    })
   }
 })();
