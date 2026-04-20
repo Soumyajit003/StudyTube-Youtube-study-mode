@@ -39,8 +39,12 @@ console.log("✅Study mode is running...");
         "ytd-rich-section-renderer",
       );
       shortsSectionHome.forEach((section) => section?.remove());
-
-      //grid-shelf-view-model
+      
+      // remove shorts section from the search results page
+      const shortsSectionSearch = document.querySelectorAll(
+        "grid-shelf-view-model",
+      );
+      shortsSectionSearch.forEach((section) => section?.remove());
 
       // remove shorts button forom the sidebar
       const shortsButton = document.querySelector("a[title='Shorts']");
