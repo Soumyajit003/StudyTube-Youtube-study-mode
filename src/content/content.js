@@ -33,13 +33,13 @@ console.log("✅Study mode is running...");
         "yt-horizontal-list-renderer",
       );
       shortsSectionSuggestions.forEach((section) => section?.remove());
-      
+
       // remove shorts section from the homepage
       const shortsSectionHome = document.querySelectorAll(
         "ytd-rich-section-renderer",
       );
       shortsSectionHome.forEach((section) => section?.remove());
-      
+
       // remove shorts section from the search results page
       const shortsSectionSearch = document.querySelectorAll(
         "grid-shelf-view-model",
@@ -86,7 +86,6 @@ console.log("✅Study mode is running...");
     blockShortsPage();
     removeShortsUI();
     initObserver();
-    
   }
 
   init();
@@ -117,7 +116,6 @@ console.log("✅Study mode is running...");
     "programming",
     "development",
     "roadmap",
-    "guide",
   ];
 
   // core logic to check if a video is educational based on its title
@@ -128,39 +126,55 @@ console.log("✅Study mode is running...");
 
   // main function to filter content on the page
   function filterContent() {
-    const videos = document.querySelectorAll("ytd-rich-item-renderer, ytd-video-renderer, yt-lockup-view-model");
+  const videos = document.querySelectorAll(
+    "ytd-rich-item-renderer, ytd-video-renderer, yt-lockup-view-model",
+  );
 
-    videos.forEach((video) => {
+  videos.forEach((video) => {
+    const titleElement = video.querySelector("h3 a[aria-label]");
+    const title = titleElement?.getAttribute("aria-label")?.trim() ?? "";
 
-      // for the videos
-      const titleElement = video.querySelector("h3 a[aria-label]");
-      const title = titleElement ? titleElement.getAttribute("aria-label").trim() : "";
-      console.log(title);
+    const mixTitleElement = video.querySelector(
+      "h3.ytLockupMetadataViewModelHeadingReset span",
+    );
+    const mixTitle = mixTitleElement?.textContent?.trim() ?? "";
 
-      const thumbnailDiv = video.querySelector("yt-thumbnail-view-model div");
-      const thumbnailImg = video.querySelector("ytd-thumbnail");
+    const thumbnailDiv = video.querySelector("yt-thumbnail-view-model div");
+    const thumbnailImg = video.querySelector("ytd-thumbnail");
+    const videoDescriptionSnippet = video.querySelector(
+      "yt-formatted-string.metadata-snippet-text",
+    );
 
-      const videoDescriptionSnippet = video.querySelector("yt-formatted-string.metadata-snippet-text");
+    const applyBlur = (titleEl) => {
+      video.style.opacity = "0.5";
+      video.style.pointerEvents = "none";
+      if (thumbnailDiv) thumbnailDiv.style.filter = "blur(20px)";
+      if (thumbnailImg) thumbnailImg.style.filter = "blur(20px)";
+      if (videoDescriptionSnippet)
+        videoDescriptionSnippet.style.filter = "blur(10px)";
+      if (titleEl) titleEl.style.filter = "blur(10px)";
+    };
 
-      if(!title) return;
+    const removeBlur = (titleEl) => {
+      video.style.opacity = "1";
+      video.style.pointerEvents = "auto";
+      if (thumbnailDiv) thumbnailDiv.style.filter = "none";
+      if (thumbnailImg) thumbnailImg.style.filter = "none";
+      if (videoDescriptionSnippet)
+        videoDescriptionSnippet.style.filter = "none";
+      if (titleEl) titleEl.style.filter = "none";
+    };
 
-      const allowed = isEducational(title);
+    // Handle regular videos
+    if (title) {
+      isEducational(title) ? removeBlur(titleElement) : applyBlur(titleElement);
+      return; // already handled, skip mix check
+    }
 
-      if(!allowed){
-        video.style.opacity = "0.5";
-        video.style.pointerEvents = "none";
-        if(thumbnailDiv) thumbnailDiv.style.filter = "blur(20px)";
-        if(thumbnailImg) thumbnailImg.style.filter = "blur(20px)";
-        if(videoDescriptionSnippet) videoDescriptionSnippet.style.filter = "blur(10px)";
-        titleElement.style.filter = "blur(10px)";
-      }else {
-        video.style.opacity = "1";
-        video.style.pointerEvents = "auto";
-        if(thumbnailDiv) thumbnailDiv.style.filter = "none";
-        if(thumbnailImg) thumbnailImg.style.filter = "none";
-        titleElement.style.filter = "none";
-
-      }
-    })
-  }
+    // Handle mix playlists
+    if (mixTitle) {
+      isEducational(mixTitle) ? removeBlur(mixTitleElement) : applyBlur(mixTitleElement);
+    }
+  });
+}
 })();
