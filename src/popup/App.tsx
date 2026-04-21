@@ -1,5 +1,5 @@
 import '../index.css'
-import Popup from './Popup.tsx'
+import Popup from './Popup'
 
 const App = () => {
   return (

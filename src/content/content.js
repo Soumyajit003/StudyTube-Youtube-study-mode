@@ -1,7 +1,73 @@
 console.log("✅Study mode is running...");
+import { settings } from "./../../node_modules/@types/chrome/index.d";
 
 (function () {
   let lastUrl = location.href;
+
+  // ======================== Settings ========================
+  let settings = {
+    studyMode: true,
+    shortsBlock: true,
+    filtering: true,
+  };
+
+  // load initial settings
+  chrome.storage.sync.get(settings, (storedSettings) => {
+    settings = storedSettings;
+    console.log("[Settings] Loaded settings:", settings);
+    applyFeatures();
+  });
+
+  // listen for real-time settings changes
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "sync") return;
+
+    for (let key in changes) {
+      settings[key] = changes[key].newValue;
+    }
+    console.log("[Settings] Updated settings:", settings);
+    applyFeatures();
+  });
+
+  // ======================== Core CONTROLLER ========================
+  function applyFeatures() {
+    console.log("[ApplyFeatrues] Applying features with settings:", settings);
+
+    resetUI();
+
+    if (!settings.studyMode) return;
+
+    if (settings.shortsBlock) {
+      blockShortsPage();
+      removeShortsUI();
+    }
+
+    if (settings.filtering) {
+      filterContent();
+    }
+  }
+
+  // ======================== Reset UI ========================
+  function resetUI() {
+    const videos = document.querySelectorAll(
+      "ytd-rich-item-renderer, ytd-video-renderer, yt-lockup-view-model",
+    );
+
+    videos.forEach((video) => {
+      video.style.opacity = "1";
+      video.style.pointerEvents = "auto";
+
+      const thumbnailDiv = video.querySelector("yt-thumbnail-view-model div");
+      const thumbnailImg = video.querySelector("ytd-thumbnail");
+      const title = video.querySelector("h3");
+      const desc = video.querySelector("yt-formatted-string");
+
+      if (thumbnailDiv) thumbnailDiv.style.filter = "none";
+      if (thumbnailImg) thumbnailImg.style.filter = "none";
+      if (title) title.style.filter = "none";
+      if (desc) desc.style.filter = "none";
+    });
+  }
 
   // ======================== Feature 1: Shorts Blocker ========================
 
@@ -67,39 +133,6 @@ console.log("✅Study mode is running...");
       alert("🚫 Shorts are blocked in Study Mode");
     }
   }
-
-  // ----------------- Mutation Observer for Dynamic Content -----------------
-  function initObserver() {
-    const observer = new MutationObserver(() => {
-      removeShortsUI();
-      filterContent();
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    console.log("[Observer] MutationObserver initialized");
-  }
-
-  // ----------------- Runner -----------------
-  // initial run on page load
-  function init() {
-    blockShortsPage();
-    removeShortsUI();
-    initObserver();
-  }
-
-  init();
-
-  // handle dynamic page changes (YouTube is a SPA, so we need to check for URL changes)
-  setInterval(() => {
-    if (lastUrl !== location.href) {
-      lastUrl = location.href;
-      console.log("[NAV] URL changed");
-
-      blockShortsPage();
-    }
-  }, 500);
-
   // add click listener to block shorts clicks
   document.addEventListener("click", handleShortsClicks);
 
@@ -321,4 +354,32 @@ console.log("✅Study mode is running...");
       }
     });
   }
+
+  // ----------------- Mutation Observer for Dynamic Content -----------------
+  function initObserver() {
+    const observer = new MutationObserver(() => {
+      if (!settings.studyMode) return;
+
+      if (settings.shortsBlock) removeShortsUI();
+      if (settings.filtering) filterContent();
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    console.log("[Observer] MutationObserver initialized");
+  }
+
+  // ======================== Initialization & URL Change Handling ========================
+  // initial run on page load
+  initObserver();
+
+  // handle dynamic page changes (YouTube is a SPA, so we need to check for URL changes)
+  setInterval(() => {
+    if (lastUrl !== location.href) {
+      lastUrl = location.href;
+      console.log("[NAV] URL changed");
+
+      applyFeatures();
+    }
+  }, 500);
 })();

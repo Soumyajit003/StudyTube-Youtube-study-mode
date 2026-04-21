@@ -8,7 +8,7 @@ function Popup() {
   useEffect(() => {
     chrome.storage.sync.get(
       ["studyMode", "shortsBlock", "filtering"],
-      (data) => {
+      (data: any) => {
         setStudyMode(data.studyMode ?? false);
         setShortsBlock(data.shortsBlock ?? false);
         setFiltering(data.filtering ?? false);
@@ -28,7 +28,7 @@ function Popup() {
         <Toggle
           label="Enable Study Mode"
           value={studyMode}
-          onChange={(val) => {
+          onChange={(val: boolean) => {
             setStudyMode(val);
             updateSettings("studyMode", val);
           }}
@@ -37,7 +37,7 @@ function Popup() {
         <Toggle
           label="Block Shorts"
           value={shortsBlock}
-          onChange={(val) => {
+          onChange={(val: boolean) => {
             setShortsBlock(val);
             updateSettings("shortsBlock", val);
           }}
@@ -46,7 +46,7 @@ function Popup() {
         <Toggle
           label="Filter Comments"
           value={filtering}
-          onChange={(val) => {
+          onChange={(val: boolean) => {
             setFiltering(val);
             updateSettings("filtering", val);
           }}
