@@ -1,5 +1,4 @@
 console.log("✅Study mode is running...");
-import { settings } from "./../../node_modules/@types/chrome/index.d";
 
 (function () {
   let lastUrl = location.href;
@@ -12,8 +11,8 @@ import { settings } from "./../../node_modules/@types/chrome/index.d";
   };
 
   // load initial settings
-  chrome.storage.sync.get(settings, (storedSettings) => {
-    settings = storedSettings;
+  chrome.storage.sync.get(["studyMode", "shortsBlock", "filtering"], (storedSettings) => {
+    settings = { ...settings, ...storedSettings };
     console.log("[Settings] Loaded settings:", settings);
     applyFeatures();
   });
@@ -28,6 +27,18 @@ import { settings } from "./../../node_modules/@types/chrome/index.d";
     console.log("[Settings] Updated settings:", settings);
     applyFeatures();
   });
+
+  // listen for popup message (instant trigger)
+  chrome.runtime.onMessage.addListener((msg) => {
+    if(msg.type === "SETTINGS_UPDATED"){
+      console.log("Message received from popup...");
+
+      chrome.storage.sync.get(["studyMode", "shortsBlock", "filtering"], (storedSettings) => {
+        settings = { ...settings, ...storedSettings };
+        applyFeatures();
+      })
+    }
+  })
 
   // ======================== Core CONTROLLER ========================
   function applyFeatures() {
@@ -112,11 +123,11 @@ import { settings } from "./../../node_modules/@types/chrome/index.d";
       );
       shortsSectionSearch.forEach((section) => section?.remove());
 
-      // remove shorts button forom the sidebar
+      // remove shorts button from the sidebar
       const shortsButton = document.querySelector("a[title='Shorts']");
       if (shortsButton) shortsButton.style.display = "none";
     } catch (error) {
-      console.log("[Shorts Error]", err);
+      console.log("[Shorts Error]", error);
     }
   }
 
