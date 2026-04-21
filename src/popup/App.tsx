@@ -1,9 +1,10 @@
 import '../index.css'
+import Popup from './Popup.tsx'
 
 const App = () => {
   return (
     <div>
-      <h1 className='text-red-600 font-bold'>StudyTube</h1>
+      <Popup />
     </div>
   )
 }
