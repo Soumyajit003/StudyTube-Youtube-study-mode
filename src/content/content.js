@@ -18,6 +18,7 @@ console.log("✅Study mode is running...");
   });
 
   // listen for real-time settings changes
+  // this is needed to handle changes made in other tabs or from the popup without needing a page reload
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "sync") return;
 
