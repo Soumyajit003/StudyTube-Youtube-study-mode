@@ -5,9 +5,9 @@ console.log("✅Study mode is running...");
 
   // ======================== Settings ========================
   let settings = {
-    studyMode: true,
-    shortsBlock: true,
-    filtering: true,
+    studyMode: false,
+    shortsBlock: false,
+    filtering: false,
   };
 
   // load initial settings
@@ -43,40 +43,77 @@ console.log("✅Study mode is running...");
 
   // ======================== Core CONTROLLER ========================
   function applyFeatures() {
-    console.log("[ApplyFeatrues] Applying features with settings:", settings);
+    console.log("[ApplyFeatures] Applying features with settings:", settings);
 
-    resetUI();
-
-    if (!settings.studyMode) return;
+    if (!settings.studyMode) {
+      resetUI();
+      toggleShortsUI(false);
+      return;
+    }
 
     if (settings.shortsBlock) {
       blockShortsPage();
-      removeShortsUI();
+      toggleShortsUI(true);
+    } else {
+      toggleShortsUI(false);
     }
 
     if (settings.filtering) {
       filterContent();
+    } else {
+      resetUI();
     }
   }
 
-  // ======================== Reset UI ========================
+  // ======================== UI Utilities ========================
+  function applyBlur(video, titleEl) {
+    const thumbnailDiv = video.querySelector("yt-thumbnail-view-model div");
+    const thumbnailImg = video.querySelector("ytd-thumbnail");
+    const videoDescriptionSnippet = video.querySelector(
+      "yt-formatted-string.metadata-snippet-text",
+    );
+
+    video.style.opacity = "0.5";
+    video.style.pointerEvents = "none";
+    if (thumbnailDiv) thumbnailDiv.style.filter = "blur(20px)";
+    if (thumbnailImg) thumbnailImg.style.filter = "blur(20px)";
+    if (videoDescriptionSnippet) videoDescriptionSnippet.style.filter = "blur(10px)";
+    if (titleEl) titleEl.style.filter = "blur(10px)";
+  }
+
+  function removeBlur(video, titleEl) {
+    const thumbnailDiv = video.querySelector("yt-thumbnail-view-model div");
+    const thumbnailImg = video.querySelector("ytd-thumbnail");
+    const videoDescriptionSnippet = video.querySelector(
+      "yt-formatted-string.metadata-snippet-text",
+    );
+
+    video.style.opacity = "1";
+    video.style.pointerEvents = "auto";
+    if (thumbnailDiv) thumbnailDiv.style.filter = "none";
+    if (thumbnailImg) thumbnailImg.style.filter = "none";
+    if (videoDescriptionSnippet) videoDescriptionSnippet.style.filter = "none";
+    if (titleEl) titleEl.style.filter = "none";
+  }
+
   function resetUI() {
     const videos = document.querySelectorAll(
       "ytd-rich-item-renderer, ytd-video-renderer, yt-lockup-view-model",
     );
 
     videos.forEach((video) => {
-      video.style.opacity = "1";
-      video.style.pointerEvents = "auto";
+      const titleElement = video.querySelector("h3 a[aria-label]");
+      const mixTitleElement = video.querySelector(
+        "h3.ytLockupMetadataViewModelHeadingReset span",
+      );
+      
+      removeBlur(video, titleElement);
+      if (mixTitleElement) removeBlur(video, mixTitleElement);
 
-      const thumbnailDiv = video.querySelector("yt-thumbnail-view-model div");
-      const thumbnailImg = video.querySelector("ytd-thumbnail");
-      const title = video.querySelector("h3");
+      // fallback for general h3 and other elements
+      const h3 = video.querySelector("h3");
       const desc = video.querySelector("yt-formatted-string");
-
-      if (thumbnailDiv) thumbnailDiv.style.filter = "none";
-      if (thumbnailImg) thumbnailImg.style.filter = "none";
-      if (title) title.style.filter = "none";
+      if (h3) h3.style.filter = "none";
       if (desc) desc.style.filter = "none";
     });
   }
@@ -91,44 +128,44 @@ console.log("✅Study mode is running...");
     }
   }
 
-  // remove shorts video renderers from the page
-  function removeShortsUI() {
+  // toggle shorts visibility instead of removing them
+  function toggleShortsUI(hide) {
     try {
-      // remove shorts shelf (homepage)
-      const shortsShelfs = document.querySelectorAll(
-        "ytd-shorts-shelf-renderer",
-      );
-      shortsShelfs.forEach((shelf) => shelf?.remove());
+      const displayValue = hide ? "none" : "";
 
-      // remove shorts video renderers
-      const shortsRenderers = document.querySelectorAll(
-        "ytd-reel-video-renderer",
-      );
-      shortsRenderers.forEach((renderer) => renderer?.remove());
+      // 1. Shorts shelf (homepage)
+      const shortsShelfs = document.querySelectorAll("ytd-shorts-shelf-renderer");
+      shortsShelfs.forEach((shelf) => {
+        if (shelf) shelf.style.display = displayValue;
+      });
 
-      // remove shorts section from the suggestions page
-      const shortsSectionSuggestions = document.querySelectorAll(
-        "yt-horizontal-list-renderer",
-      );
-      shortsSectionSuggestions.forEach((section) => section?.remove());
+      // 2. Shorts video renderers
+      const shortsRenderers = document.querySelectorAll("ytd-reel-video-renderer");
+      shortsRenderers.forEach((renderer) => {
+        if (renderer) renderer.style.display = displayValue;
+      });
 
-      // remove shorts section from the homepage
-      const shortsSectionHome = document.querySelectorAll(
-        "ytd-rich-section-renderer",
+      // 3. Shorts section from suggestions/search
+      const shortsSections = document.querySelectorAll(
+        "yt-horizontal-list-renderer, ytd-rich-section-renderer, grid-shelf-view-model"
       );
-      shortsSectionHome.forEach((section) => section?.remove());
+      shortsSections.forEach((section) => {
+        // Only hide if it's actually a shorts section (contains "Shorts" text)
+        if (hide && section.textContent.toLowerCase().includes("shorts")) {
+          section.style.display = "none";
+        } else if (!hide) {
+          section.style.display = "";
+        }
+      });
 
-      // remove shorts section from the search results page
-      const shortsSectionSearch = document.querySelectorAll(
-        "grid-shelf-view-model",
-      );
-      shortsSectionSearch.forEach((section) => section?.remove());
+      // 4. Sidebar/Mini-guide buttons
+      const shortsLinks = document.querySelectorAll("a[title='Shorts'], ytd-guide-entry-renderer:has(a[title='Shorts']), ytd-mini-guide-entry-renderer:has(a[title='Shorts'])");
+      shortsLinks.forEach(link => {
+        if (link) link.style.display = displayValue;
+      });
 
-      // remove shorts button from the sidebar
-      const shortsButton = document.querySelector("a[title='Shorts']");
-      if (shortsButton) shortsButton.style.display = "none";
     } catch (error) {
-      console.log("[Shorts Error]", error);
+      console.log("[Shorts Toggle Error]", error);
     }
   }
 
@@ -324,45 +361,19 @@ console.log("✅Study mode is running...");
       );
       const mixTitle = mixTitleElement?.textContent?.trim() ?? "";
 
-      const thumbnailDiv = video.querySelector("yt-thumbnail-view-model div");
-      const thumbnailImg = video.querySelector("ytd-thumbnail");
-      const videoDescriptionSnippet = video.querySelector(
-        "yt-formatted-string.metadata-snippet-text",
-      );
-
-      const applyBlur = (titleEl) => {
-        video.style.opacity = "0.5";
-        video.style.pointerEvents = "none";
-        if (thumbnailDiv) thumbnailDiv.style.filter = "blur(20px)";
-        if (thumbnailImg) thumbnailImg.style.filter = "blur(20px)";
-        if (videoDescriptionSnippet)
-          videoDescriptionSnippet.style.filter = "blur(10px)";
-        if (titleEl) titleEl.style.filter = "blur(10px)";
-      };
-
-      const removeBlur = (titleEl) => {
-        video.style.opacity = "1";
-        video.style.pointerEvents = "auto";
-        if (thumbnailDiv) thumbnailDiv.style.filter = "none";
-        if (thumbnailImg) thumbnailImg.style.filter = "none";
-        if (videoDescriptionSnippet)
-          videoDescriptionSnippet.style.filter = "none";
-        if (titleEl) titleEl.style.filter = "none";
-      };
-
       // Handle regular videos
       if (title) {
         isEducational(title)
-          ? removeBlur(titleElement)
-          : applyBlur(titleElement);
+          ? removeBlur(video, titleElement)
+          : applyBlur(video, titleElement);
         return; // already handled, skip mix check
       }
 
       // Handle mix playlists
       if (mixTitle) {
         isEducational(mixTitle)
-          ? removeBlur(mixTitleElement)
-          : applyBlur(mixTitleElement);
+          ? removeBlur(video, mixTitleElement)
+          : applyBlur(video, mixTitleElement);
       }
     });
   }
@@ -372,7 +383,7 @@ console.log("✅Study mode is running...");
     const observer = new MutationObserver(() => {
       if (!settings.studyMode) return;
 
-      if (settings.shortsBlock) removeShortsUI();
+      if (settings.shortsBlock) toggleShortsUI(true);
       if (settings.filtering) filterContent();
     });
 
