@@ -41,7 +41,7 @@ console.log("✅Study mode is running...");
     }
   })
 
-  // ======================== Core CONTROLLER ========================
+  // ======================== CORE CONTROLLER ========================
   function applyFeatures() {
     console.log("[ApplyFeatures] Applying features with settings:", settings);
 
