@@ -272,8 +272,6 @@ console.log("✅Study mode is running...");
     "learning",
     "study",
     "education",
-    "academic",
-    "university",
     "exam",
     "mathematics",
     "calculus",
